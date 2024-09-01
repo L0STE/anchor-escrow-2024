@@ -49,15 +49,18 @@ pub struct Make<'info> {
 }
 
 impl<'info> Make<'info> {
-    pub fn save_escrow(&mut self, seed: u64, receive: u64, bumps: &MakeBumps) -> Result<()> {
-        self.escrow.set_inner(Escrow {
-            seed,
-            maker: self.maker.key(),
-            mint_a: self.mint_a.key(),
-            mint_b: self.mint_b.key(),
-            receive,
-            bump: bumps.escrow,
-        });
+    pub fn save_escrow(&mut self, seed: u64, receive: u64, expiry: u64, bumps: &MakeBumps) -> Result<()> {
+        self.escrow.set_inner(
+            Escrow {
+                seed,
+                maker: self.maker.key(),
+                mint_a: self.mint_a.key(),
+                mint_b: self.mint_b.key(),
+                receive,
+                expiry: Clock::get()?.unix_timestamp.checked_add(expiry as i64).unwrap(),
+                bump: bumps.escrow,
+            }
+        );
         Ok(())
     }
 

@@ -5,7 +5,7 @@ use anchor_spl::{
     token_interface::{close_account, transfer_checked, Mint, TokenAccount, TokenInterface, CloseAccount, TransferChecked},
 };
 
-use crate::Escrow;
+use crate::{Escrow, EscrowErrors};
 
 #[derive(Accounts)]
 pub struct Take<'info> {
@@ -61,7 +61,9 @@ pub struct Take<'info> {
 }
 
 impl<'info> Take<'info> {
-    pub fn deposit(&mut self) -> Result<()> {
+    pub fn deposit(&mut self) -> Result<()> {        
+        require_gte!(self.escrow.expiry, Clock::get()?.unix_timestamp, EscrowErrors::EscrowExpired);
+
         let transfer_accounts = TransferChecked {
             from: self.taker_ata_b.to_account_info(),
             mint: self.mint_b.to_account_info(),

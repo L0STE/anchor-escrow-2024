@@ -3,6 +3,9 @@ use anchor_lang::prelude::*;
 pub mod contexts;
 use contexts::*;
 
+pub mod errors;
+pub use errors::*;
+
 pub mod state;
 pub use state::*;
 
@@ -12,9 +15,9 @@ declare_id!("6BLPdL9narQPFQsqS7AXuRBRS4VoyKmHHzdwkgnLaAps");
 pub mod anchor_escrow {
     use super::*;
 
-    pub fn make(ctx: Context<Make>, seed: u64, deposit: u64, receive: u64) -> Result<()> {
+    pub fn make(ctx: Context<Make>, seed: u64, deposit: u64, receive: u64, expiry: u64) -> Result<()> {
         ctx.accounts.deposit(deposit)?;
-        ctx.accounts.save_escrow(seed, receive, &ctx.bumps)
+        ctx.accounts.save_escrow(seed, receive, expiry, &ctx.bumps)
     }
 
     pub fn refund(ctx: Context<Refund>) -> Result<()> {
