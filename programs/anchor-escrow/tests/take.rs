@@ -234,7 +234,7 @@ async fn take_error_escrow_expired() {
         bump,
     };
 
-    let mut escrow_data = vec![0u8; Escrow::INIT_SPACE];
+    let mut escrow_data = vec![];
     escrow.try_serialize(&mut escrow_data).unwrap();
 
     let mut account = AccountSharedData::new(
@@ -266,7 +266,7 @@ async fn take_error_escrow_expired() {
     
     // Process the transaction and expect an error
     let result = context.banks_client.process_transaction(transaction).await;
-    assert!(result.is_err(), "Transaction should fail due to expired escrow");
+    assert_escrow_error(result.unwrap_err(), anchor_escrow::errors::EscrowErrors::EscrowExpired);
 
     // Verify that the escrow and vault accounts still exist
     let escrow_account = context.banks_client.get_account(escrow_pubkey).await.unwrap();
